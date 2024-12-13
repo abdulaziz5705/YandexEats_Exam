@@ -1,0 +1,2 @@
+Swagger qushudim ammo yaxshi ishlamadi shunga API larni postmanda test qilib kurdim
+Swagger nastroykasida yoki qayerdadir xatolik bulyapti authorizatsiya qismida kamchilik bor ekan
