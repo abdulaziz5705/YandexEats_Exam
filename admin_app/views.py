@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from restaurants.admin import Restaurant
+
 from .models import ManagerandCourierModel
 from .permissions import IsCourier, IsRestaurantManager
 from .serializers import RestaurantManagerSerializer, LoginSerializer

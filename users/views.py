@@ -23,7 +23,7 @@ class RegisterView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save()
-        user.set_password(serializer.validated_data['password'])
+        # user.set_password(serializer.validated_data['password'])
         user.is_active = True
         user.save()
         return user
@@ -131,7 +131,7 @@ class CategoryView(APIView):
 
 
 class AllUsersView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
     def get(self, request):

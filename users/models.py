@@ -4,10 +4,11 @@ from django.db import models
 
 
 class UserModel(AbstractUser):
-    email = models.EmailField(unique=False)
-    phone_number = models.CharField(max_length=13, unique=True)
+    email = models.EmailField(unique=True)
 
-
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
 class VerificationModel(models.Model):
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name='verification')

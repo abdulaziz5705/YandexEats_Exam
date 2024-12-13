@@ -1,42 +1,35 @@
-
 from datetime import timezone, timedelta
-
-from django.contrib.auth import authenticate
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
-
 from users.models import UserModel, VerificationModel
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    phone_number = serializers.CharField(max_length=20, validators=[UniqueValidator(queryset=UserModel.objects.all())])
-    confirm_password = serializers.CharField(write_only=True)
-    password = serializers.CharField(min_length=8, write_only=True)
-
     class Meta:
         model = UserModel
-        fields = ['id','username','phone_number', 'email','password', 'confirm_password']
+        fields = ['id','first_name','email',]
+        username_field = 'email'
         extra_kwargs = {
+            'password': {'write_only': True},
             'first_name': {'write_only': True},
             'last_name': {'write_only': True},
+            'username': {'write_only': True},
 
-        }
+                }
+    # def validate(self, attrs):
+    #     password = attrs.get('password')
+    #     confirm_password = attrs.get('confirm_password')
+    #     if password != confirm_password:
+    #         raise serializers.ValidationError('Passwords must match')
+    #     return attrs
 
-    def validate(self, attrs):
-        password = attrs.get('password')
-        confirm_password = attrs.get('confirm_password')
-        if password != confirm_password:
-            raise serializers.ValidationError('Passwords must match')
-        return attrs
-
-    def validate_phone_number(self, phone_number: str):
-        phone_number = phone_number.strip()
-        if not phone_number.startswith('+998'):
-            raise serializers.ValidationError('Phone number must start with +998')
-        if not phone_number[4:].isdigit():
-            raise serializers.ValidationError('Phone number must contain only numbers')
-        return phone_number
+    # def validate_phone_number(self, phone_number: str):
+    #     phone_number = phone_number.strip()
+    #     if not phone_number.startswith('+998'):
+    #         raise serializers.ValidationError('Phone number must start with +998')
+    #     if not phone_number[4:].isdigit():
+    #         raise serializers.ValidationError('Phone number must contain only numbers')
+    #     return phone_number
 
     def validate_email(self, email):
         if not email.endswith('@gmail.com') or  email.endswith('@mail.com') or email.count('@') != 1:
@@ -45,9 +38,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        validated_data.pop('confirm_password')
+        validated_data['username']  = validated_data.pop('first_name')
         user = UserModel.objects.create_user(**validated_data)
-        user.set_password(validated_data['password'])
         user.save()
         return user
 
@@ -73,27 +65,26 @@ class VerifyEmailSerializer(serializers.Serializer):
         attrs['user_code'] = user_code
         return attrs
 
-class LoginSerializer(serializers.Serializer):
-    email_or_username = serializers.CharField(max_length=200)
-    password = serializers.CharField(max_length=100,write_only=True)
-    errors = 'Email\ username or password errors'
-    def validate(self, attrs):
-        email_or_username = attrs.get('email_or_username')
-        password = attrs.get('password')
-        errors = attrs.get('errors')
-        try:
-            if email_or_username.endswith('@gmail.com'):
-                user = UserModel.objects.get(email=email_or_username)
-            else:
-                user = UserModel.objects.get(username=email_or_username)
-        except UserModel.DoesNotExist:
-            raise serializers.ValidationError(errors)
 
-        authenticated = authenticate(username=user.username, password=password)
-        if not authenticated:
-            raise serializers.ValidationError(errors)
-        attrs['user'] = authenticated
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+
+
+        if not email:
+            raise serializers.ValidationError('Email is required')
+
+
+        try:
+            user = UserModel.objects.get(email=email)
+        except UserModel.DoesNotExist:
+            raise serializers.ValidationError('User with this email does not exist')
+
+        attrs['user'] = user
         return attrs
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
