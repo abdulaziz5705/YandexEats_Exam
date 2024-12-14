@@ -16,20 +16,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             'username': {'write_only': True},
 
                 }
-    # def validate(self, attrs):
-    #     password = attrs.get('password')
-    #     confirm_password = attrs.get('confirm_password')
-    #     if password != confirm_password:
-    #         raise serializers.ValidationError('Passwords must match')
-    #     return attrs
 
-    # def validate_phone_number(self, phone_number: str):
-    #     phone_number = phone_number.strip()
-    #     if not phone_number.startswith('+998'):
-    #         raise serializers.ValidationError('Phone number must start with +998')
-    #     if not phone_number[4:].isdigit():
-    #         raise serializers.ValidationError('Phone number must contain only numbers')
-    #     return phone_number
 
     def validate_email(self, email):
         if not email.endswith('@gmail.com') or  email.endswith('@mail.com') or email.count('@') != 1:

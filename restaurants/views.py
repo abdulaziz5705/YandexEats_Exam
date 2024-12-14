@@ -2,85 +2,47 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import  status
-from rest_framework.permissions import IsAdminUser,  IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from restaurants.models import RestaurantModel, CategoryMenuModel, MenuModel
+
+from restaurants.models import  CategoryMenuModel, MenuModel
 from restaurants.serializers.serializersMenu.Menu import CategoryMenuSerializer, MenuSerializer
-from restaurants.serializers.serializersRestaurant.adminCreate import RestaurantSerializer
+from admin_app.permissions import IsRestaurantManager
+from users.models import UserModel
+from restaurants.serializers.serializersRestaurant.adminCreate import ManagerSerializer
 
-## <<<<<<<RESTAURANT>>>>>>>
+#<<<Profile>>>>
 
-@method_decorator(csrf_exempt, name='dispatch')
-class CRUDRestaurantView(APIView):
-    serializer_class = RestaurantSerializer
-    permission_classes = [IsAdminUser]
+class ManagerProfile(APIView):
 
-    def get(self, request, pk):
-        try:
-            r = RestaurantModel.objects.get(pk=pk)
-        except RestaurantModel.DoesNotExist:
-            return Response({"detail": "Restaurant not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = RestaurantSerializer(r)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, pk):
-        r = get_object_or_404(RestaurantModel, pk=pk)
-        serializer = RestaurantSerializer(instance=r,data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        response = {
-            "status": True,
-            "message": "Restaurant updated",
-            "data": serializer.data
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
-    def patch(self, request, pk):
-        r = get_object_or_404(RestaurantModel, pk=pk)
-        serializer = RestaurantSerializer(instance=r,data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        response = {
-            "status": True,
-            "message": "Restaurant updated",
-            "data": serializer.data
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
-    def delete(self, request, pk=None):
-        r = get_object_or_404(RestaurantModel, pk=pk)
-        r.delete()
-        response = {
-            "status": True,
-            "message": "Restaurant deleted",
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
-@method_decorator(csrf_exempt, name='dispatch')
-class CreateRestaurantView(APIView):
-    serializer_class = RestaurantSerializer
-    permission_classes = [IsAdminUser]
+    queryset = UserModel.objects.filter(role='manager')
+    serializer_class = ManagerSerializer
+    permission_classes = [IsRestaurantManager]
 
     def get(self, request):
-        r = RestaurantModel.objects.all()
-        serializer = RestaurantSerializer(r, many=True).data
-        return Response(serializer, status=status.HTTP_200_OK)
+        user = request.user
+        serializer = self.serializer_class(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-    def post(self, request):
-        serializer = RestaurantSerializer(data=request.data)
+    def patch(self, request):
+        user = get_object_or_404(UserModel, id=request.user.id)
+        serializer = self.serializer_class(instance=user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        responce = {
+            "status": True,
+            "message": "success patch",
+        }
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
         response = {
             "status": True,
-            "message": "Restaurant created",
-            "data": serializer.data
+            "message": "Your account has been deleted",
         }
-        return Response(response, status=status.HTTP_201_CREATED)
-
-
+        return Response(response, status=status.HTTP_204_NO_CONTENT)
 
 
 ## <<<<<<<<<<<<<<CATEGORY>>>>>>>>>>>>>>>>
@@ -88,7 +50,7 @@ class CreateRestaurantView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CategoryMenuView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsRestaurantManager]
     def get(self, request):
         category = CategoryMenuModel.objects.all()
         serializer = CategoryMenuSerializer(category, many=True).data
@@ -103,7 +65,7 @@ class CategoryMenuView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CategoryMenuCRUDView(APIView):
-        permission_classes = [IsAuthenticated]
+        permission_classes = [IsRestaurantManager]
         def get(self, request, pk):
             try:
                 r = CategoryMenuModel.objects.get(pk=pk)
@@ -141,7 +103,7 @@ class CategoryMenuCRUDView(APIView):
 ## <<<<<<<<<<<<<<<MENU>>>>>>>>>>>>>>>>>>>>>>
 
 class CreateMenuView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsRestaurantManager]
     serializer_class = MenuSerializer
 
     def get(self, request):
@@ -160,7 +122,7 @@ class CreateMenuView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class MenuCRUDView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsRestaurantManager]
     serializer_class = MenuSerializer
     def get(self, request, pk):
         menu = get_object_or_404(MenuModel, pk=pk)

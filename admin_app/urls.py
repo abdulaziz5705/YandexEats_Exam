@@ -3,7 +3,11 @@ from admin_app import views
 
 urlpatterns = [
     path('create/manager/curiers/', views.UsersView.as_view(), name='restaurant_manager'),
-    path('curier/profil/', views.CourierView.as_view(), name='curier_profil'),
-    path('manager/profil/', views.RestaurantManagerView.as_view(), name='manager_profil'),
+    path('curier/all/', views.CourierView.as_view(), name='curier_profil'),
+    path('restaurant/all/', views.RestaurantManagerView.as_view(), name='manager_profil'),
     path('login/', views.LoginView.as_view(), name='login'),
+
+    path('create/', views.CreateRestaurantView.as_view(), name='restaurant_create'),
+    path('crud/<int:pk>', views.CRUDRestaurantView.as_view(), name='restaurant_crud'),
+
 ]

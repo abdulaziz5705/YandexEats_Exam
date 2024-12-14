@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from admin_app.models import  ManagerandCourierModel
+from users.models import *
 
 
 class RestaurantManagerSerializer(serializers.ModelSerializer):
@@ -8,7 +7,7 @@ class RestaurantManagerSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = ManagerandCourierModel
+        model = UserModel
         fields = '__all__'
 
     def validate(self, attrs):
@@ -25,7 +24,7 @@ class RestaurantManagerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        manager = ManagerandCourierModel.objects.create(**validated_data)
+        manager = UserModel.objects.create(**validated_data)
         manager.set_password(validated_data['password'])
         manager.save()
         return manager
@@ -45,8 +44,8 @@ class LoginManagerSerializer(serializers.Serializer):
 
 
         try:
-            user = ManagerandCourierModel.objects.get(username=username)
-        except ManagerandCourierModel.DoesNotExist:
+            user = UserModel.objects.get(username=username)
+        except UserModel.DoesNotExist:
             raise serializers.ValidationError('User with this username does not exist')
 
         attrs['user'] = user

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from restaurants.models import *
+from users.models import UserModel
 
 
 class RestaurantSerializer(serializers.ModelSerializer):
@@ -17,3 +18,13 @@ class RestaurantSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+
+
+class ManagerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = '__all__'
+
+    def __str__(self):
+        return f"{self.name}, {self.role} "

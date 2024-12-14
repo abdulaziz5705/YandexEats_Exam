@@ -17,10 +17,14 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
         return instance
 
 
+
+
+
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuModel
         fields = '__all__'
+
 
     def create(self, validated_data):
         return MenuModel.objects.create(**validated_data)
