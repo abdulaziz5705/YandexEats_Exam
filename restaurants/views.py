@@ -2,11 +2,9 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import  status
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAdminUser,  IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
 from restaurants.models import RestaurantModel, CategoryMenuModel, MenuModel
 from restaurants.serializers.serializersMenu.Menu import CategoryMenuSerializer, MenuSerializer
 from restaurants.serializers.serializersRestaurant.adminCreate import RestaurantSerializer
@@ -83,6 +81,8 @@ class CreateRestaurantView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 
+
+
 ## <<<<<<<<<<<<<<CATEGORY>>>>>>>>>>>>>>>>
 
 
@@ -143,11 +143,6 @@ class CategoryMenuCRUDView(APIView):
 class CreateMenuView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = MenuSerializer
-
-    @swagger_auto_schema(
-        operation_description="Get example endpoint",
-        responses={200: 'Success!'},
-    )
 
     def get(self, request):
         menu = MenuModel.objects.all()

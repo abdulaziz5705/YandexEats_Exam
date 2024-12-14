@@ -1,4 +1,3 @@
-from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from admin_app.models import  ManagerandCourierModel
@@ -32,34 +31,8 @@ class RestaurantManagerSerializer(serializers.ModelSerializer):
         return manager
 
 
-# class LoginSerializer(serializers.Serializer):
-#     email_or_username = serializers.CharField(max_length=255)
-#     password = serializers.CharField(max_length=100,write_only=True)
-#     errors = 'Email\ username or password errors'
-#     def validate(self, attrs):
-#         email_or_username = attrs.get('email_or_username')
-#         print(email_or_username)
-#         password = attrs.get('password')
-#         errors = attrs.get('errors')
-#         try:
-#             if email_or_username.endswith('@gmail.com'):
-#                 user = ManagerandCourierModel.objects.get(email=email_or_username)
-#                 print("email: ",user)
-#             else:
-#                 user = ManagerandCourierModel.objects.get(username=email_or_username)
-#                 print("username: ",user)
-#         except ManagerandCourierModel.DoesNotExist:
-#             raise serializers.ValidationError(errors)
-#         print(user)
-#
-#         authenticated = authenticate(username=user.username, password=password)
-#         if not authenticated:
-#             raise serializers.ValidationError(errors)
-#         attrs['user'] = authenticated
-#         return attrs
 
-
-class LoginSerializer(serializers.Serializer):
+class LoginManagerSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=100, write_only=True)
 

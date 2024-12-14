@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from restaurants.models import RestaurantModel, CategoryMenuModel
-from restaurants.serializers.serializersMenu.Menu import CategoryMenuSerializer
+from restaurants.models import RestaurantModel, CategoryMenuModel, MenuModel
+from restaurants.serializers.serializersMenu.Menu import CategoryMenuSerializer, MenuSerializer
 from restaurants.serializers.serializersRestaurant.adminCreate import RestaurantSerializer
 from users.models import UserModel
 from users.serializers import RegistrationSerializer, VerifyEmailSerializer, LoginSerializer, UserProfileSerializer, \
@@ -23,7 +23,6 @@ class RegisterView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save()
-        # user.set_password(serializer.validated_data['password'])
         user.is_active = True
         user.save()
         return user
@@ -47,20 +46,6 @@ class VerifyEmailView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-class LoginView(APIView):
-    serializer_class = LoginSerializer
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        refresh = RefreshToken.for_user(serializer.validated_data['user'])
-        response = {
-            "access_token": str(refresh.access_token),
-            "refresh_token": str(refresh)
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
 class EmailCodeView(APIView):
     permission_classes = [AllowAny]
     serializer_class = ResendCodeSerializer
@@ -76,6 +61,21 @@ class EmailCodeView(APIView):
             "message": "Verification code has been sent for your email",
         }
         return Response(response, status=status.HTTP_200_OK)
+
+class LoginView(APIView):
+    serializer_class = LoginSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        refresh = RefreshToken.for_user(serializer.validated_data['user'])
+        response = {
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh)
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -111,6 +111,20 @@ class ProfileView(APIView):
 
 
 
+
+class AllUsersView(APIView):
+    permission_classes = [IsAdminUser]
+    queryset = UserModel.objects.all()
+    serializer_class = UserSerializer
+    def get(self, request):
+        users = self.queryset.all()
+        serializer = self.serializer_class(users, many=True).data
+        return Response(serializer, status=status.HTTP_200_OK)
+
+
+
+
+
 class RestaurantView(APIView):
     permission_classes = [AllowAny]
     serializer_class = RestaurantSerializer
@@ -130,11 +144,11 @@ class CategoryView(APIView):
         return Response(serializer, status=status.HTTP_200_OK)
 
 
-class AllUsersView(APIView):
+class MenuView(APIView):
+    queryset = MenuModel.objects.all()
     permission_classes = [AllowAny]
-    queryset = UserModel.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = MenuSerializer
     def get(self, request):
-        users = self.queryset.all()
-        serializer = self.serializer_class(users, many=True).data
+        category = self.queryset.all()
+        serializer = self.serializer_class(category, many=True).data
         return Response(serializer, status=status.HTTP_200_OK)

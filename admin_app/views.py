@@ -1,22 +1,21 @@
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from .models import ManagerandCourierModel
-from .permissions import IsCourier, IsRestaurantManager
-from .serializers import RestaurantManagerSerializer, LoginSerializer
+from .serializers import RestaurantManagerSerializer,  LoginManagerSerializer
 
 
 class RestaurantManagerView(APIView):
-    permission_classes = [IsRestaurantManager]
+    permission_classes = [AllowAny]
     def get(self, request):
         return Response({"message": "Restaurant Manager"})
 
 class CourierView(APIView):
-    permission_classes = [IsCourier]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response({"message": "Hello, Courier!"})
@@ -36,7 +35,7 @@ class UsersView(generics.CreateAPIView):
 
 
 class LoginView(APIView):
-    serializer_class = LoginSerializer
+    serializer_class = LoginManagerSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
