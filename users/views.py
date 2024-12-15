@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from orders.models import OrderFromUser
+from orders.serializers import OrderUserSerializer
 from restaurants.models import RestaurantModel, CategoryMenuModel, MenuModel
 from restaurants.serializers.serializersMenu.Menu import CategoryMenuSerializer, MenuSerializer
 from restaurants.serializers.serializersRestaurant.adminCreate import RestaurantSerializer
@@ -25,6 +27,10 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save()
         user.is_active = True
         user.save()
+        response = {
+            "message": "Send code for your email code have active only 2 minuts "
+                       "check email code verify/email urls  "
+        }
         return user
 
 class VerifyEmailView(APIView):
@@ -152,3 +158,17 @@ class MenuView(APIView):
         category = self.queryset.all()
         serializer = self.serializer_class(category, many=True).data
         return Response(serializer, status=status.HTTP_200_OK)
+
+class OrderUserView(APIView):
+    serializer_class = OrderUserSerializer
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        order = OrderFromUser.objects.all()
+        serializer = OrderUserSerializer(order, many=True).data
+        return Response(serializer, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = OrderUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

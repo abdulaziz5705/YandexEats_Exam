@@ -33,7 +33,7 @@ class MenuModel(models.Model):
     massa = models.CharField(max_length=50)
     image = models.ImageField(upload_to='menu_images/', null=True, blank=True)
     category = models.ForeignKey(CategoryMenuModel, on_delete=models.CASCADE, related_name='category_menus')
-    restaurants = models.ManyToManyField(RestaurantModel)
+    restaurants = models.ForeignKey(RestaurantModel, on_delete=models.CASCADE, related_name='restaurant_menu')
 
     def __str__(self):
         return self.name

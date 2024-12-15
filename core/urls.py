@@ -5,29 +5,19 @@ from django.conf import settings
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+"""Swagger authorization yaxshi  ishlamadi shunga hamma apilarni postmanda tekshirdim"""
 schema_view = get_schema_view(
     openapi.Info(
-        title="Instagram JWT API",
+        title="Yandex Eats",
         default_version='v1',
-        description="API for Instagram JWT",
+        description="Api for Yandex Eats",
     ),
     public=True,
-    permission_classes=[IsAuthenticated],  # Restrict schema view to authenticated users if needed
+    permission_classes=[AllowAny],
     authentication_classes=[SessionAuthentication, BasicAuthentication, JWTAuthentication],
-)
-swagger_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        "Authorization": openapi.Schema(
-            type=openapi.TYPE_STRING,
-            description="JWT Authorization header using Bearer scheme. Example: 'Bearer <token>'",
-        ),
-    },
-    required=["Authorization"],
 )
 urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -44,6 +34,8 @@ urlpatterns = [
     path('couriers/', include('couriers.urls')),
 
     path('restaurants/', include('restaurants.urls')),
+
+    path('orders/', include('orders.urls'))
 ]
 
 

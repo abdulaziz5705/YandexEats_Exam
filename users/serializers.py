@@ -84,7 +84,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        exclude = ['password', 'groups', 'user_permissions', 'is_superuser']
+        exclude = ['password']
         extra_kwargs = {
             'last_login': {'read_only': True},
             'date_joined': {'read_only': True},

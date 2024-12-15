@@ -123,11 +123,15 @@ class CreateMenuView(APIView):
 
 class MenuCRUDView(APIView):
     permission_classes = [IsRestaurantManager]
-    serializer_class = MenuSerializer
+
     def get(self, request, pk):
-        menu = get_object_or_404(MenuModel, pk=pk)
-        serializer = MenuSerializer(menu, many=True).data
-        return Response(serializer, status=status.HTTP_200_OK)
+        try:
+            r = MenuModel.objects.get(pk=pk)
+        except MenuModel.DoesNotExist:
+            return Response({"detail": "Menu not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MenuSerializer(r)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         menu = get_object_or_404(MenuModel, pk=pk)

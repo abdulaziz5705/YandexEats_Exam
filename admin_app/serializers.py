@@ -3,6 +3,8 @@ from users.models import *
 
 
 class RestaurantManagerSerializer(serializers.ModelSerializer):
+    """Registrator serializer yani admin tomonidan restaurant manager va
+    courierga username va password yaratish """
     password = serializers.CharField(max_length=8,write_only=True)
     confirm_password = serializers.CharField(write_only=True)
 
@@ -32,6 +34,7 @@ class RestaurantManagerSerializer(serializers.ModelSerializer):
 
 
 class LoginManagerSerializer(serializers.Serializer):
+    """Berilgan username bilan login qilish """
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=100, write_only=True)
 

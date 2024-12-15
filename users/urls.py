@@ -19,5 +19,6 @@ urlpatterns = [
     path('category/', views.CategoryView.as_view(), name='restaurants'),
     path('menu/', views.MenuView.as_view(), name='menu'),
 
+    path('my/orders/', views.OrderUserView.as_view(), name='order'),
 
 ]
